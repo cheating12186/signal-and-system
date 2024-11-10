@@ -1,0 +1,383 @@
+                                       EXPERIMENT 
+Plot for Magnitude and Phase Spectrum for Signum Function 
+clear all;
+close all;
+clc;
+
+% Time and frequency parameters
+time_period = 2 * pi;
+step_size = 0.001;
+t = -time_period/2 : step_size : time_period/2;  % Time vector
+tt = length(t);
+omega_o = 2 * pi / time_period;
+no_of_forier_coeff = 50;
+n = -no_of_forier_coeff : 1 : no_of_forier_coeff;
+
+% Initialize signal x_t
+x_t = zeros(1, tt);  % Pre-allocate for speed
+
+% Define the signal x_t
+for ii = 1:tt
+    if (t(ii) >= -pi && t(ii) <= 0)
+        x_t(ii) = -1;
+    elseif t(ii) > 0 && t(ii) <= pi
+        x_t(ii) = 1;
+    else
+        x_t(ii) = 0;
+    end
+end
+
+% Plot the signal x_t
+figure;
+plot(t, x_t);
+title('Signum x(t)');
+xlabel('Time');
+ylabel('Amplitude');
+
+% Fourier Coefficients calculation
+c_n = zeros(1, length(n));  % Initialize c_n for Fourier coefficients
+
+for ii = 1:length(n)  % Loop over Fourier coefficients
+    temp = x_t .* exp(-1j * omega_o * n(ii) * t);  % Element-wise multiplication
+    int_ans = my_int_func(temp, step_size);  % Call the integration function
+    c_n(ii) = (1 / time_period) * int_ans;  % Calculate the Fourier coefficient
+end
+
+% Plot the magnitude and phase of Fourier coefficients
+figure;
+stem(n, abs(c_n));
+title('Magnitude of Fourier Coefficients');
+xlabel('n');
+ylabel('|c_n|');
+figure;
+stem(n, angle(c_n));
+title('Phase of Fourier Coefficients');
+xlabel('n');
+ylabel('Phase of c_n (radians)');
+
+% Integration function for trapezoidal rule
+function[int_ans] = my_int_func(Data, step_size)
+    int_ans = (step_size / 2) * (Data(1) + Data(end) + 2 * sum(Data(2:end-1)));
+end
+
+ 
+ 
+
+  
+        
+
+         
+
+
+
+Plot for Magnitude and Phase Spectrum for Unit Step Function 
+clear all;
+close all;
+clc;
+
+% Time and frequency parameters
+time_period = 5;           % Define the time period
+step_size = 0.001;         % Step size
+t = 0:step_size:time_period; % Time vector
+tt = length(t);
+omega_o = 2 * pi / time_period;
+no_of_forier_coeff = 50;   % Number of Fourier coefficients
+n = -no_of_forier_coeff : 1 : no_of_forier_coeff; % Range of Fourier coefficients
+
+% Initialize signal x_t
+x_t = zeros(1, tt);  % Pre-allocate for speed
+
+% Define the signal x_t
+for ii = 1:tt
+    if (t(ii) >=0)
+        x_t(ii) = 1;
+    else
+        x_t(ii) = 0;
+    end
+end
+
+% Plot the signal x_t
+figure;
+plot(t, x_t);
+title('Unit Step x(t)');
+xlabel('Time');
+ylabel('Amplitude');
+
+% Fourier Coefficients calculation
+c_n = zeros(1, length(n));  % Initialize c_n for Fourier coefficients
+
+for ii = 1:length(n)  % Loop over Fourier coefficients
+    temp = x_t .* exp(-1j * omega_o * n(ii) * t);  % Element-wise multiplication
+    int_ans = my_int_func(temp, step_size);  % Call the integration function
+    c_n(ii) = (1 / time_period) * int_ans;  % Calculate the Fourier coefficient
+end
+
+% Plot the magnitude and phase of Fourier coefficients
+figure;
+stem(n, abs(c_n));  % Plot magnitude
+title('Magnitude of Fourier Coefficients');
+xlabel('n');
+ylabel('|c_n|');
+
+figure;
+stem(n, angle(c_n));  % Plot phase
+title('Phase of Fourier Coefficients');
+xlabel('n');
+ylabel('Phase of c_n (radians)');
+
+% Integration function for trapezoidal rule
+function[int_ans] = my_int_func(Data, step_size)
+    int_ans = (step_size / 2) * (Data(1) + Data(end) + 2 * sum(Data(2:end-1)));
+end 
+Plot for Magnitude and Phase Spectrum for Square Wave Function 
+% Fourier Transform
+clear all;
+close all;
+clc;
+% Parameters
+time_period = 1;               % Set the time period
+step_size_t = 0.0001;          % Step size for time vector
+t = -time_period/2:step_size_t:time_period/2; % Time vector
+tt = length(t);                % Length of the time vector
+omega_o = 2 * pi / time_period; % Fundamental frequency
+no_of_fourier_coeff = 50;      % Number of Fourier coefficients
+n = -no_of_fourier_coeff:1:no_of_fourier_coeff; % Coefficient index
+% Define the square wave signal
+x = zeros(size(t)); % Preallocate x for efficiency
+for ii = 1:tt
+    if (t(ii) < -0.25)
+        x(ii) = -1;           % Set value for t < -0.25
+    elseif (t(ii) >= -0.25 && t(ii) < 0.25)
+        x(ii) = 1;            % Set value for -0.25 <= t < 0.25
+    else
+        x(ii) = -1;           % Set value for t >= 0.25
+    end
+end
+% Plot the square wave signal
+figure;
+plot(t, x)
+xlabel("Time (t)");
+ylabel("x(t)");
+title("Square Wave Signal");
+grid on; % Add grid for better readability
+
+% Fourier series coefficients calculation using my_int_fun
+c = zeros(size(n)); % Preallocate c for Fourier coefficients
+for ii = 1:length(n)  % Loop over the range of n
+    temp1 = x .* exp(-1j * omega_o * n(ii) * t); % Calculate the product
+    int_ans = my_int_fun(temp1, step_size_t);     % Use custom integration function
+    c(ii) = (1 / time_period) * int_ans;           % Compute Fourier coefficient
+end
+
+% Plot the magnitude of Fourier coefficients
+figure;
+stem(n, abs(c)); % Plot the magnitude
+xlabel('n');
+ylabel('|C_n|');
+title('Magnitude of Fourier Coefficients');
+grid on;
+
+% Plot the phase of Fourier coefficients
+figure;
+stem(n, angle(c)); % Plot the phase
+xlabel('n');
+ylabel('Phase of C_n (radians)');
+title('Phase of Fourier Coefficients');
+grid on;
+% Custom integration function
+function [int_ans] = my_int_fun(data, step_size)
+    int_ans = (step_size / 2) * (data(1) + data(end) + 2 * sum(data(2:end-1))); % Corrected sum range
+end
+
+
+
+ 
+       
+
+        
+
+      
+
+
+
+
+Plot for Magnitude and Phase Spectrum for Sine Wave Function 
+clear all;
+close all;
+clc;
+
+% Define parameters
+time_period = 2 * pi;        % Set the time period to 2*pi
+step_size = 0.001;           % Step size for time vector
+t = 0:step_size:time_period; % Time vector from 0 to time_period
+tt = length(t);              % Length of the time vector
+omega_o = 2 * pi / time_period; % Fundamental frequency
+no_of_fourier_coeff = 50;   % Number of Fourier coefficients
+n = -no_of_fourier_coeff:1:no_of_fourier_coeff; % Coefficient index
+
+% Define the function x_t
+x_t = sin(omega_o * t);      % x_t is the sine wave based on the fundamental frequency
+
+% Plot x_t
+figure;
+plot(t, x_t);
+title('x(t) = sin(\omega_0 t)');
+xlabel('Time (s)');
+ylabel('x(t)');
+grid on;
+
+% Initialize Fourier coefficients array
+c_n = zeros(size(n));
+
+% Calculate Fourier coefficients
+for k = 1:length(n)
+    omega = omega_o * n(k);  % Angular frequency for the Fourier term
+    % Use the integration function for trapezoidal rule
+    c_n(k) = my_int_func(x_t .* exp(-1i * omega * t), step_size); % Compute Fourier coefficient
+end
+
+% Plot magnitude of Fourier coefficients
+figure;
+stem(n, abs(c_n));
+title('Magnitude of Fourier Coefficients');
+xlabel('n');
+ylabel('|c_n|');
+grid on;
+
+% Plot phase of Fourier coefficients
+figure;
+stem(n, angle(c_n));
+title('Phase of Fourier Coefficients');
+xlabel('n');
+ylabel('Phase(c_n)');
+grid on;
+
+% Integration function for trapezoidal rule
+function[int_ans] = my_int_func(Data, step_size)
+    int_ans = (step_size / 2) * (Data(1) + Data(end) + 2 * sum(Data(2:end-1)));
+end 
+
+    ASSIGNMENT
+
+Plot for Magnitude and Phase Spectrum for Cosine Wave Function 
+clear all;
+close all;
+clc;
+
+% Define parameters
+time_period = 2 * pi;        % Set the time period to 2*pi
+step_size = 0.001;           % Step size for time vector
+t = 0:step_size:time_period; % Time vector from 0 to time_period
+tt = length(t);              % Length of the time vector
+omega_o = 2 * pi / time_period; % Fundamental frequency (omega_0)
+no_of_fourier_coeff = 50;    % Number of Fourier coefficients
+n = -no_of_fourier_coeff:1:no_of_fourier_coeff; % Coefficient index
+
+% Define the cosine wave function x_t
+x_t = cos(omega_o * t);      % x_t is the cosine wave based on the fundamental frequency
+% Plot x_t (cosine wave)
+figure;
+plot(t, x_t, 'LineWidth', 1.5);
+title('x(t) = cos(\omega_0 t)');
+xlabel('Time (s)');
+ylabel('x(t)');
+grid on;
+
+% Initialize Fourier coefficients array
+c_n = zeros(size(n));
+
+% Calculate Fourier coefficients
+for k = 1:length(n)
+    omega = omega_o * n(k);  % Angular frequency for the Fourier term
+    % Use the integration function for trapezoidal rule
+    c_n(k) = my_int_func(x_t .* exp(-1i * omega * t), step_size); % Compute Fourier coefficient
+end
+
+% Plot magnitude of Fourier coefficients
+figure;
+stem(n, abs(c_n), 'LineWidth', 1.5);
+title('Magnitude of Fourier Coefficients');
+xlabel('n');
+ylabel('|c_n|');
+grid on;
+
+% Plot phase of Fourier coefficients
+figure;
+stem(n, angle(c_n), 'LineWidth', 1.5);
+title('Phase of Fourier Coefficients');
+xlabel('n');
+ylabel('Phase(c_n)');
+grid on;
+% Integration function for trapezoidal rule
+function[int_ans] = my_int_func(Data, step_size)
+    int_ans = (step_size / 2) * (Data(1) + Data(end) + 2 * sum(Data(2:end-1)));
+end
+ 
+       
+
+         
+
+    
+
+
+
+
+
+Plot for Magnitude and Phase Spectrum for Triangular Wave Function 
+clear all;
+close all;
+clc;
+
+% Parameters
+time_period = 1;               % Set the time period (T)
+step_size_t = 0.0001;          % Step size for time vector
+t = -time_period/2:step_size_t:time_period/2; % Time vector
+tt = length(t);                % Length of the time vector
+omega_o = 2 * pi / time_period; % Fundamental frequency (omega_0)
+no_of_fourier_coeff = 50;      % Number of Fourier coefficients
+n = -no_of_fourier_coeff:1:no_of_fourier_coeff; % Coefficient index (n)
+
+% Define the triangular wave signal
+x = zeros(size(t)); % Preallocate x for efficiency
+for ii = 1:tt
+    if (t(ii) < 0)
+      x(ii) = 1 + (4 / time_period) * t(ii);  % Slope for t < 0
+    else
+    x(ii) = 1 - (4 / time_period) * t(ii);  % Slope for t >= 0
+    end
+end
+% Plot the triangular wave signal
+figure;
+plot(t, x, 'LineWidth', 1.5);
+xlabel("Time (t)");
+ylabel("x(t)");
+title("Triangular Wave Signal");
+grid on;
+
+% Fourier series coefficients calculation using custom integration function
+c = zeros(size(n)); % Preallocate c for Fourier coefficients
+for ii = 1:length(n)  % Loop over the range of n
+    temp1 = x .* exp(-1j * omega_o * n(ii) * t); % Calculate the product x(t)*exp(-j*n*omega_0*t)
+    int_ans = my_int_fun(temp1, step_size_t);     % Use custom integration function
+    c(ii) = (1 / time_period) * int_ans;           % Compute Fourier coefficient
+end
+% Plot the magnitude of Fourier coefficients
+figure;
+stem(n, abs(c), 'LineWidth', 1.5); % Plot the magnitude
+xlabel('n');
+ylabel('|C_n|');
+title('Magnitude of Fourier Coefficients ');
+grid on;
+
+% Plot the phase of Fourier coefficients
+figure;
+stem(n, angle(c), 'LineWidth', 1.5); % Plot the phase
+xlabel('n');
+ylabel('Phase of C_n (radians)');
+title('Phase of Fourier Coefficients ');
+grid on;
+% Custom integration function (Trapezoidal Rule)
+function [int_ans] = my_int_fun(data, step_size)
+    int_ans = (step_size / 2) * (data(1) + data(end) + 2 * sum(data(2:end-1))); % Corrected sum range for trapezoidal integration
+end 
+
