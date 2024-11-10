@@ -1,0 +1,183 @@
+Shifting and Scaling of Function W.r.t Dependent and Independent Axis
+clear all
+close all
+clc
+
+% Define the original signal
+x = linspace(-1, 1, 100);  % independent axis S1
+y = sqrt(1 - (x.^2));      % dependent axis S1
+a = linspace(2, 4, 100);   % independent axis S2
+b = sqrt(1 - (a - 3).^2);  % dependent axis S2
+
+c = linspace(1, 1.5, 25);  % independent axis S3
+y1 = 2 .* (1 - c);         % dependent axis S3
+d = linspace(1.5, 2, 25);  % independent axis S4
+y2 = (d - 2) ./ 0.5;       % dependent axis S4
+
+% Concatenate the segments
+z1 = [x, c];               % independent axis S1+S2
+z2 = [z1, d];              % independent axis (S1 + S2) + S3 
+z = [z2, a];               % independent axis (S1 + S2 + S3) + S4
+
+q1 = [y, y1];              % dependent axis S1 + S2
+q2 = [q1, y2];             % dependent axis (S1 + S2) + S3 
+q = [q2, b];               % dependent axis (S1 + S2 + S3) + S4
+ 
+ 
+% Plot the original signal x(t)
+subplot(4, 2, [1 2])
+plot(z, q);
+title("Original signal x(t)");
+xlim([-1 4]);
+ylim([-2 2]);
+grid on;
+
+% Plot x(2t) - time compression
+subplot(4, 2, 3)
+plot(z .* 0.5, q);
+title("x(2t)");
+xlim([-1 4]);
+ylim([-2 2]);
+grid on;
+
+% Plot x(t+2) - time shift to the left by 2
+subplot(4, 2, 4)
+plot(z - 2, q);
+title("x(t+2)");
+xlim([-4 4]);
+ylim([-2 2]);
+grid on;
+
+% Plot 2x(t) - amplitude scaling
+subplot(4, 2, 5)
+plot(z, 2 .* q);
+title("2x(t)");
+xlim([-1 4]);
+ylim([-2 2]);
+grid on;
+% Plot x(t) + 2 - vertical shift
+subplot(4, 2, 6)
+plot(z, q + 2);
+title("x(t) + 2");
+xlim([-1 4]);
+ylim([-4 4]);
+grid on;
+
+% Plot x(-t) - time reversal
+subplot(4, 2, 7)
+plot(-z, q);
+title("x(-t)");
+xlim([-4 4]);
+ylim([-2 2]);
+grid on;
+
+% Plot -x(t) - amplitude reversal
+subplot(4, 2, 8)
+plot(z,-q);
+title("-x(t)");
+xlim([-1 4]);
+ylim([-2 2]);
+grid on;
+
+
+
+
+
+
+
+
+
+
+clear all;
+close all;
+clc;
+
+% Define time axis
+t = linspace(-10, 10, 1000);  % Time vector
+x_t = sin(t);  % Original function x(t) = sin(t)
+% Create figure with subplots for each transformation
+figure;
+
+% x(2t) - Time compression
+subplot(5, 2, 1);
+plot(t, sin(2 * t));
+title('x(2t)');
+xlabel('t');
+ylabel('Amplitude');
+grid on;
+
+% x(0.5t) - Time expansion
+subplot(5, 2, 2);
+plot(t, sin(0.5 * t));
+title('x(0.5t)');
+xlabel('t');
+ylabel('Amplitude');
+grid on;
+
+% 3x(2t) - Time compression with amplitude scaling
+subplot(5, 2, 3);
+plot(t, 3 * sin(2 * t));
+title('3x(2t)');
+xlabel('t');
+ylabel('Amplitude');
+grid on;
+
+% 3x(0.5t) - Time expansion with amplitude scaling
+subplot(5, 2, 4);
+plot(t, 3 * sin(0.5 * t));
+title('3x(0.5t)');
+xlabel('t');
+ylabel('Amplitude');
+grid on;
+
+%  x(2t + 3) - Time shift with compression
+subplot(5, 2, 5);
+plot(t, sin(2 * t + 3));
+title('x(2t + 3)');
+xlabel('t');
+ylabel('Amplitude');
+grid on;
+
+%  x(0.5t + 3) - Time shift with expansion
+subplot(5, 2, 6);
+plot(t, sin(0.5 * t + 3));
+title('x(0.5t + 3)');
+xlabel('t');
+ylabel('Amplitude');
+grid on;
+
+% 4x(0.5t - 3) - Amplitude scaling, time shift, and expansion
+subplot(5, 2, 7);
+plot(t, 4 * sin(0.5 * t - 3));
+title('4x(0.5t - 3)');
+xlabel('t');
+ylabel('Amplitude');
+grid on;
+
+%  -2x(-3t - 4) - Amplitude reversal, time reversal, scaling, and shift
+subplot(5, 2, 8);
+plot(t, -2 * sin(-3 * t - 4));
+title('-2x(-3t - 4)');
+xlabel('t');
+ylabel('Amplitude');
+grid on;
+
+% -2x(-3(t - 2)) - Time and amplitude reversal, scaling with shift
+subplot(5, 2, 9);
+plot(t, -2 * sin(-3 * (t - 2)));
+title('-2x(-3(t - 2))');
+xlabel('t');
+ylabel('Amplitude');
+grid on;
+
+%  -2x(-3(t + 2) + 2) - Complex transformation
+subplot(5, 2, 10);
+plot(t, -2 * sin(-3 * (t + 2) + 2));
+title('-2x(-3(t + 2) + 2)');
+xlabel('t');
+ylabel('Amplitude');
+grid on;
+
+% Adjust figure layout for readability
+sgtitle('Modifications of x(t) = sin(t)');
+
