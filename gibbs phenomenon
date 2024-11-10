@@ -1,0 +1,1204 @@
+GIBBS PHENOMENON – Square Wave 
+ 
+clear all;
+close all;
+clc;
+
+% Time period and other variables
+time_period = 2;  % square wave
+step_size_t = 0.0001;
+t = 0:step_size_t:time_period;
+tt = length(t);
+omega_o = 2 * pi / time_period;  % Fundamental angular frequency
+
+% Number of Fourier coefficients
+no_of_fourier_coeff = 50;
+kk = -no_of_fourier_coeff:1:no_of_fourier_coeff;
+
+% Initialize v_t for square wave signal
+v_t = zeros(1, tt);
+for ii = 1:tt
+    if (t(ii) <= 1)  % High part of the square wave for 0 <= t <= 1
+        v_t(ii) = 1;
+    else             % Low part of the square wave for 1 < t <= 2
+        v_t(ii) = -1;
+    end
+end
+
+% Plot the square wave
+subplot(4,2,[1,2]), plot(t, v_t);
+xlabel("time(t)");
+ylabel("v(t)");
+title('Square Wave');
+
+% Fourier coefficient array initialization
+a_k = zeros(1, 2 * no_of_fourier_coeff + 1);  % For storing Fourier coefficients
+
+% Calculate Fourier coefficients
+for ii = 1:1:(2 * no_of_fourier_coeff + 1)
+    k = kk(ii);  % Fourier series index
+    temp1 = v_t .* exp(-1i * k * omega_o * t);  % v(t) * exp(-j * k * omega_o * t)
+   
+    % Integrate over the period using trapezoidal rule
+    int_ans = my_int_func(temp1, step_size_t);
+    
+    % Calculate Fourier coefficient
+    a_k(ii) = (1 / time_period) * int_ans;
+end
+
+% Plot Fourier coefficients
+subplot(4,2,[3,4]), stem(kk, abs(a_k));
+xlabel('k');
+ylabel('|a_k|');
+title('Magnitude of Fourier Coefficients');
+
+% Initialize harmonics
+harmonics = zeros(1, tt);
+
+% Reconstruct signal from harmonics
+mid_term_of_fs = no_of_fourier_coeff + 1;
+for ii = 1:no_of_fourier_coeff  % Fixed range for ii
+    if ii == 1
+        harmonics = harmonics + a_k(mid_term_of_fs) * exp(1i * 0 * omega_o * t);
+    else
+        harmonics = harmonics + a_k(mid_term_of_fs - ii + 1) * exp(1i * (ii-1) * omega_o * t) + ...
+                             a_k(mid_term_of_fs + ii - 1) * exp(-1i * (ii-1) * omega_o * t);
+    end
+end
+
+% Plot the harmonics
+subplot(4,2,[5,6]), plot(t, real(harmonics));
+title('Harmonics of the Reconstructed Signal');
+
+% Plot the reconstructed signal vs original signal
+reconstructed_signal = real(harmonics);
+subplot(4,2,[7,8]), plot(t, reconstructed_signal, 'b', t, v_t, '--r');
+title('Reconstructed Signal vs Original Signal (with Gibbs Phenomenon)');
+
+% Custom integration function
+function [int_ans] = my_int_func(Data, step_size_t)
+    int_ans = (step_size_t / 2) * (Data(1) + Data(end) + 2 * sum(Data(2:end-1)));
+end
+
+ 
+
+ 
+
+
+GIBBS PHENOMENON – Triangular Wave 
+ 
+ 
+clc;
+clear all;
+close all;
+
+% Time period and other variables
+time_period = 2;  % for triangular wave
+step_size_t = 0.0001;
+t = 0:step_size_t:time_period;
+tt = length(t);
+omega_o = 2 * pi / time_period;  % Fundamental angular frequency
+
+% Number of Fourier coefficients
+no_of_fourier_coeff = 50;
+kk = -no_of_fourier_coeff:1:no_of_fourier_coeff;
+
+% Initialize v_t for triangular wave signal
+v_t = zeros(1, tt);
+for ii = 1:tt
+    if t(ii) <= time_period / 2
+        % Linearly increase from 0 to 1 in the first half of the period
+        v_t(ii) = (2 / (time_period / 2)) * t(ii);
+    else
+        % Linearly decrease from 1 to 0 in the second half of the period
+        v_t(ii) = 2 - (2 / (time_period / 2)) * t(ii);
+    end
+end
+
+% Plot the triangular wave
+subplot(4,2,[1,2]), plot(t, v_t);
+xlabel("time(t)");
+ylabel("v(t)");
+title('Triangular Wave');
+
+% Fourier coefficient array initialization
+a_k = zeros(1, 2 * no_of_fourier_coeff + 1);  % For storing Fourier coefficients
+
+% Calculate Fourier coefficients
+for ii = 1:1:(2 * no_of_fourier_coeff + 1)
+    k = kk(ii);  % Fourier series index
+    temp1 = v_t .* exp(-1i * k * omega_o * t);  % v(t) * exp(-j * k * omega_o * t)
+   
+    % Integrate over the period using trapezoidal rule
+    int_ans = my_int_func(temp1, step_size_t);
+    
+    % Calculate Fourier coefficient
+    a_k(ii) = (1 / time_period) * int_ans;
+end
+
+% Plot Fourier coefficients
+subplot(4,2,[3,4]), stem(kk, abs(a_k));
+xlabel('k');
+ylabel('|a_k|');
+title('Magnitude of Fourier Coefficients');
+
+% Initialize harmonics
+harmonics = zeros(1, tt);
+
+% Reconstruct signal from harmonics
+mid_term_of_fs = no_of_fourier_coeff + 1;
+for ii = 1:no_of_fourier_coeff  % Fixed range for ii
+    if ii == 1
+        harmonics = harmonics + a_k(mid_term_of_fs) * exp(1i * 0 * omega_o * t);
+    else
+        harmonics = harmonics + a_k(mid_term_of_fs - ii + 1) * exp(1i * (ii-1) * omega_o * t) + ...
+                             a_k(mid_term_of_fs + ii - 1) * exp(-1i * (ii-1) * omega_o * t);
+    end
+end
+
+% Plot the harmonics
+subplot(4,2,[5,6]), plot(t, real(harmonics));
+title('Harmonics of the Reconstructed Signal');
+
+% Plot the reconstructed signal vs original signal
+reconstructed_signal = real(harmonics);
+subplot(4,2,[7,8]), plot(t, reconstructed_signal, 'b', t, v_t, '--r');
+title('Reconstructed Signal vs Original Signal (with Gibbs Phenomenon)');
+
+% Custom integration function
+function [int_ans] = my_int_func(Data, step_size_t)
+    int_ans = (step_size_t / 2) * (Data(1) + Data(end) + 2 * sum(Data(2:end-1)));
+end
+ 
+
+
+ 
+
+GIBBS PHENOMENON – Signum Function
+
+ 
+clc;
+clear all;
+close all;
+
+% Time period and other variables
+time_period = 2;  % for signum function representation
+step_size_t = 0.0001;
+t = -time_period/2:step_size_t:time_period/2;  % Symmetric time range around zero
+tt = length(t);
+omega_o = 2 * pi / time_period;  % Fundamental angular frequency
+
+% Number of Fourier coefficients
+no_of_fourier_coeff = 50;
+kk = -no_of_fourier_coeff:1:no_of_fourier_coeff;
+
+% Initialize v_t for signum function signal
+v_t = zeros(1, tt);
+for ii = 1:tt
+    if t(ii) < 0
+        v_t(ii) = -1;  % Negative values
+    elseif t(ii) == 0
+        v_t(ii) = 0;   % Zero
+    else
+        v_t(ii) = 1;   % Positive values
+    end
+end
+
+% Plot the signum function
+subplot(4,2,[1,2]), plot(t, v_t);
+xlabel("time(t)");
+ylabel("v(t)");
+title('Signum Function');
+
+% Fourier coefficient array initialization
+a_k = zeros(1, 2 * no_of_fourier_coeff + 1);  % For storing Fourier coefficients
+
+% Calculate Fourier coefficients
+for ii = 1:1:(2 * no_of_fourier_coeff + 1)
+    k = kk(ii);  % Fourier series index
+    temp1 = v_t .* exp(-1i * k * omega_o * t);  % v(t) * exp(-j * k * omega_o * t)
+   
+    % Integrate over the period using trapezoidal rule
+    int_ans = my_int_func(temp1, step_size_t);
+    
+    % Calculate Fourier coefficient
+    a_k(ii) = (1 / time_period) * int_ans;
+end
+% Plot Fourier coefficients
+subplot(4,2,[3,4]), stem(kk, abs(a_k));
+xlabel('k');
+ylabel('|a_k|');
+title('Magnitude of Fourier Coefficients');
+
+% Initialize harmonics
+harmonics = zeros(1, tt);
+
+
+
+% Reconstruct signal from harmonics
+mid_term_of_fs = no_of_fourier_coeff + 1;
+for ii = 1:no_of_fourier_coeff  % Fixed range for ii
+    if ii == 1
+        harmonics = harmonics + a_k(mid_term_of_fs) * exp(1i * 0 * omega_o * t);
+    else
+        harmonics = harmonics + a_k(mid_term_of_fs - ii + 1) * exp(1i * (ii-1) * omega_o * t) + ...
+                             a_k(mid_term_of_fs + ii - 1) * exp(-1i * (ii-1) * omega_o * t);
+    end
+end
+
+% Plot the harmonics
+subplot(4,2,[5,6]), plot(t, real(harmonics))
+title('Harmonics of the Reconstructed Signal');
+% Plot the reconstructed signal vs original signal
+reconstructed_signal = real(harmonics);
+subplot(4,2,[7,8]), plot(t, reconstructed_signal, 'b', t, v_t, '--r');
+title('Reconstructed Signal vs Original Signal (with Gibbs Phenomenon)');
+\% Custom integration function
+function [int_ans] = my_int_func(Data, step_size_t)
+    int_ans = (step_size_t / 2) * (Data(1) + Data(end) + 2 * sum(Data(2:end-1)));
+end
+ 
+
+
+ 
+
+      GIBBS PHENOMENON – Unit Step Function
+
+ 
+clc;
+clear all;
+close all;
+
+% Time period and other variables
+time_period = 2;  % for unit step function representation
+step_size_t = 0.0001;
+t = -time_period/2:step_size_t:time_period/2;  % Symmetric time range around zero
+tt = length(t);
+omega_o = 2 * pi / time_period;  % Fundamental angular frequency
+
+% Number of Fourier coefficients
+no_of_fourier_coeff = 50;
+kk = -no_of_fourier_coeff:1:no_of_fourier_coeff;
+
+% Initialize v_t for unit step function
+v_t = zeros(1, tt);
+for ii = 1:tt
+    if t(ii) < 0
+        v_t(ii) = 0;  % Values before 0
+    else
+        v_t(ii) = 1;  % Values from 0 onward
+    end
+end
+
+% Plot the unit step function
+subplot(4,2,[1,2]), plot(t, v_t);
+xlabel("time(t)");
+ylabel("v(t)");
+title('Unit Step Function');
+
+% Fourier coefficient array initialization
+a_k = zeros(1, 2 * no_of_fourier_coeff + 1);  % For storing Fourier coefficients
+
+% Calculate Fourier coefficients
+for ii = 1:1:(2 * no_of_fourier_coeff + 1)
+    k = kk(ii);  % Fourier series index
+    temp1 = v_t .* exp(-1i * k * omega_o * t);  % v(t) * exp(-j * k * omega_o * t)
+   
+    % Integrate over the period using trapezoidal rule
+    int_ans = my_int_func(temp1, step_size_t);
+    
+    % Calculate Fourier coefficient
+    a_k(ii) = (1 / time_period) * int_ans;
+end
+
+% Plot Fourier coefficients
+subplot(4,2,[3,4]), stem(kk, abs(a_k));
+xlabel('k');
+ylabel('|a_k|');
+title('Magnitude of Fourier Coefficients');
+
+% Initialize harmonics
+harmonics = zeros(1, tt);
+
+% Reconstruct signal from harmonics
+mid_term_of_fs = no_of_fourier_coeff + 1;
+for ii = 1:no_of_fourier_coeff
+    if ii == 1
+        harmonics = harmonics + a_k(mid_term_of_fs) * exp(1i * 0 * omega_o * t);
+    else
+        harmonics = harmonics + a_k(mid_term_of_fs - ii + 1) * exp(1i * (ii-1) * omega_o * t) + ...
+                             a_k(mid_term_of_fs + ii - 1) * exp(-1i * (ii-1) * omega_o * t);
+    end
+end
+
+% Plot the harmonics
+subplot(4,2,[5,6]), plot(t, real(harmonics));
+title('Harmonics of the Reconstructed Signal');
+
+% Plot the reconstructed signal vs original signal
+reconstructed_signal = real(harmonics);
+subplot(4,2,[7,8]), plot(t, reconstructed_signal, 'b', t, v_t, '--r');
+title('Reconstructed Signal vs Original Signal (with Gibbs Phenomenon)');
+
+% Custom integration function
+function [int_ans] = my_int_func(Data, step_size_t)
+    int_ans = (step_size_t / 2) * (Data(1) + Data(end) + 2 * sum(Data(2:end-1)));
+end
+ 
+
+
+ 
+
+GIBBS PHENOMENON – Rectified Sine Wave 
+
+ 
+clc;
+clear all;
+close all;
+
+% Time period and other variables
+time_period = 2.*pi;  % Time period for rectified sine function representation
+step_size_t = 0.0001;
+t = -time_period/2:step_size_t:time_period/2;  % Symmetric time range around zero
+tt = length(t);
+omega_o = 2 * pi / time_period;  % Fundamental angular frequency
+
+% Number of Fourier coefficients
+no_of_fourier_coeff = 50;
+kk = -no_of_fourier_coeff:1:no_of_fourier_coeff;
+
+% Initialize v_t for rectified sine function
+v_t_sine = zeros(1, tt);  % Preallocate v_t_sine with zeros
+for ii = 1:tt
+    if t(ii) >= 0 && t(ii) <= pi
+        v_t_sine(ii) = sin(t(ii));  % Correct assignment with indexing
+    else
+        v_t_sine(ii) = 0;  % Assign zero for negative values
+    end
+end
+
+% Plot the rectified sine function
+subplot(4,2,[1,2]), plot(t, v_t_sine);
+xlabel("time(t)");
+ylabel("v(t)");
+title('Rectified Sine Function');
+
+% Fourier coefficient array initialization
+a_k = zeros(1, 2 * no_of_fourier_coeff + 1);  % For storing Fourier coefficients
+
+% Calculate Fourier coefficients
+for ii = 1:(2 * no_of_fourier_coeff + 1)
+    k = kk(ii);  % Fourier series index
+    temp1 = v_t_sine .* exp(-1i * k * omega_o * t);  % v(t) * exp(-j * k * omega_o * t)
+   
+    % Integrate over the period using trapezoidal rule
+    int_ans = my_int_func(temp1, step_size_t);
+    
+    % Calculate Fourier coefficient
+    a_k(ii) = (1 / time_period) * int_ans;
+end
+
+% Plot Fourier coefficients
+subplot(4,2,[3,4]), stem(kk, abs(a_k));
+xlabel('k');
+ylabel('|a_k|');
+title('Magnitude of Fourier Coefficients');
+
+% Initialize harmonics
+harmonics = zeros(1, tt);
+
+
+% Reconstruct signal from harmonics
+mid_term_of_fs = no_of_fourier_coeff + 1;
+for ii = 1:no_of_fourier_coeff
+    if ii == 1
+        harmonics = harmonics + a_k(mid_term_of_fs) * exp(1i * 0 * omega_o * t);
+    else
+        harmonics = harmonics + a_k(mid_term_of_fs - ii + 1) * exp(1i * (ii-1) * omega_o * t) + ...
+                             a_k(mid_term_of_fs + ii - 1) * exp(-1i * (ii-1) * omega_o * t);
+    end
+end
+% Plot the harmonics
+subplot(4,2,[5,6]), plot(t, real(harmonics));
+title('Harmonics of the Reconstructed Signal');
+% Plot the reconstructed signal vs original signal
+reconstructed_signal = real(harmonics);
+subplot(4,2,[7,8]), plot(t, reconstructed_signal, 'b', t, v_t_sine, '--r');
+xlabel('time(t)');
+ylabel('Signal Amplitude');
+title('Reconstructed Signal vs Original Rectified Sine Signal (with Gibbs Phenomenon)');
+
+% Custom integration function
+function [int_ans] = my_int_func(Data, step_size_t)
+    int_ans = (step_size_t / 2) * (Data(1) + Data(end) + 2 * sum(Data(2:end-1)));
+end
+ 
+
+
+ 
+GIBBS PHENOMENON – Rectified Cosine Wave 
+
+ 
+clc;
+clear all;
+close all;
+
+% Time period and other variables
+time_period = 2.*pi;  % Time period for rectified cosine function representation
+step_size_t = 0.0001;
+t = -time_period/2:step_size_t:time_period/2;  % Symmetric time range around zero
+tt = length(t);
+omega_o = 2 * pi / time_period;  % Fundamental angular frequency
+
+% Number of Fourier coefficients
+no_of_fourier_coeff = 50;
+kk = -no_of_fourier_coeff:1:no_of_fourier_coeff;
+
+% Initialize v_t for rectified cosine function
+v_t_cosine = zeros(1, tt);  % Preallocate v_t_cosine with zeros
+for ii = 1:tt
+    if t(ii) >= -pi/2 && t(ii) <= pi/2
+        v_t_cosine(ii) = cos(t(ii));  % Rectified cosine function
+    else
+        v_t_cosine(ii) = 0;  % Assign zero for negative values
+    end
+end
+
+% Plot the rectified cosine function
+subplot(4,2,[1,2]), plot(t, v_t_cosine);
+xlabel("time(t)");
+ylabel("v(t)");
+title('Rectified Cosine Function');
+
+% Fourier coefficient array initialization
+a_k = zeros(1, 2 * no_of_fourier_coeff + 1);  % For storing Fourier coefficients
+
+% Calculate Fourier coefficients
+for ii = 1:(2 * no_of_fourier_coeff + 1)
+    k = kk(ii);  % Fourier series index
+    temp1 = v_t_cosine .* exp(-1i * k * omega_o * t);  % v(t) * exp(-j * k * omega_o * t)
+   
+    % Integrate over the period using trapezoidal rule
+    int_ans = my_int_func(temp1, step_size_t);
+    
+    % Calculate Fourier coefficient
+    a_k(ii) = (1 / time_period) * int_ans;
+end
+
+% Plot Fourier coefficients
+subplot(4,2,[3,4]), stem(kk, abs(a_k));
+xlabel('k');
+ylabel('|a_k|');
+title('Magnitude of Fourier Coefficients');
+
+% Initialize harmonics
+harmonics = zeros(1, tt);
+
+
+% Reconstruct signal from harmonics
+mid_term_of_fs = no_of_fourier_coeff + 1;
+for ii = 1:no_of_fourier_coeff
+    if ii == 1
+        harmonics = harmonics + a_k(mid_term_of_fs) * exp(1i * 0 * omega_o * t);
+    else
+        harmonics = harmonics + a_k(mid_term_of_fs - ii + 1) * exp(1i * (ii-1) * omega_o * t) + ...
+                             a_k(mid_term_of_fs + ii - 1) * exp(-1i * (ii-1) * omega_o * t);
+    end
+end
+% Plot the harmonics
+subplot(4,2,[5,6]), plot(t, real(harmonics));
+title('Harmonics of the Reconstructed Signal');
+% Plot the reconstructed signal vs original signal
+reconstructed_signal = real(harmonics);
+subplot(4,2,[7,8]), plot(t, reconstructed_signal, 'b', t, v_t_cosine, '--r');
+xlabel('time(t)');
+ylabel('Signal Amplitude');
+title('Reconstructed Signal vs Original Rectified Cosine Signal (with Gibbs Phenomenon)');
+
+% Custom integration function
+function [int_ans] = my_int_func(Data, step_size_t)
+    int_ans = (step_size_t / 2) * (Data(1) + Data(end) + 2 * sum(Data(2:end-1)));
+end
+ 
+
+
+ 
+            FOURIER TRANSFORMS – Sinc Function 
+ 
+
+clear all;
+close all;
+clc
+
+% Constants
+step_omega= 0.01 * pi;
+step_size_t = 0.1;
+t = -10:step_size_t:10;
+length_t = length(t);
+
+% Omega range for frequency domain
+omegax = -(1 / step_size_t) * pi : step_omega : (1 / step_size_t) * pi;
+length_omega = length(omegax);
+
+% Pre-allocate arrays
+expo_omega = zeros(length_omega, length_t);
+x_omega = zeros(1, length_omega);
+x_t_reconstructed = zeros(1, length_t);
+
+% Create Fourier exponentials
+for ii = 1:length_omega
+    expo_omega(ii, :) = exp(-1j * omegax(ii) * t);
+end
+% Pre-allocate array for sinc function
+x_t = zeros(1, length_t); 
+
+% Define sinc function in time domain
+for ii = 1:length_t
+    if t(ii) == 0
+        x_t(ii) = 1;  % Define sinc(0) = 1
+   
+ else
+        % Corrected sinc function formula (as per original structure)
+        x_t(ii) = sin((2 * pi * (1/(2 * step_size_t))) * 0.5 * t(ii)) / ...
+                      ((2 * pi * (1/(2 * step_size_t))) * 0.5 * t(ii)); 
+    end
+end 
+% Plot the sinc function
+subplot(4,1,1), plot(t, x_t);
+xlabel('time (t)');
+ylabel('x(t)');
+title('Sinc Function in Time Domain');
+
+% Compute Fourier Transform X(ω)
+for ii = 1:length_omega
+    temp = x_t .* expo_omega(ii, :);  % x(t) * exp(-jωt)
+    x_omega(ii) = my_int_func(temp, step_size_t);  % Fourier Transform
+end
+
+% Plot the magnitude of the Fourier transform
+subplot(4,1,2), plot(omegax ./ pi, abs(x_omega));
+xlabel('\omega/\pi');
+ylabel('|X(\omega)|');
+title('Fourier Transform of the Sinc Function');
+
+% Inverse Fourier Transform (reconstruct x(t))
+expo_omega_2 = exp(1j * omegax' * t);  % Create matrix of exp(jωt) for inverse transform
+
+for ii = 1:length_t
+    temp_2 = x_omega .* expo_omega_2(:, ii).';  % X(ω) * exp(jωt)
+    x_t_reconstructed(ii) = (1 / (2 * pi)) * my_int_func(temp_2, step_omega);  % Inverse Fourier Transform
+end
+
+% Plot the reconstructed signal
+subplot(4,1,3), plot(t, real(x_t_reconstructed));
+xlabel('time (t)');
+ylabel('Reconstructed x(t)');
+title('Reconstructed Signal from Fourier Transform');
+
+% Calculate and plot the phase of X(omega)
+Angle_X_Omega = atan2(imag(x_omega), real(x_omega));  % Compute phase using atan2 for correct quadrant
+
+% Plot the phase of the Fourier transform
+subplot(4,1,4), plot(omegax ./ pi, Angle_X_Omega);
+xlabel('\omega/\pi');
+ylabel('Phase \angle X(\omega) (radians)');
+title('Phase of Fourier Transform X(\omega)');
+
+%Custom integration function (trapezoidal rule)
+function [int_ans] = my_int_func(Data, step_size)
+    int_ans = (step_size / 2) * (Data(1) + Data(end) + 2 * sum(Data(2:end-1)));
+end
+ 
+
+
+ 
+FOURIER TRANSFORMS – Exponential Decay Function
+ 
+clear all;
+close all;
+clc
+
+% Constants
+step_omega = 0.01 * pi;
+step_size_t = 0.1;
+t = -10:step_size_t:10;
+length_t = length(t);
+
+% Omega range for frequency domain
+omegax = -(1 / step_size_t) * pi : step_omega : (1 / step_size_t) * pi;
+length_omega = length(omegax);
+
+% Pre-allocate arrays
+expo_omega = zeros(length_omega, length_t);
+x_omega = zeros(1, length_omega);
+x_t_reconstructed = zeros(1, length_t);
+
+% Create Fourier exponentials
+for ii = 1:length_omega
+    expo_omega(ii, :) = exp(-1j * omegax(ii) * t);
+end
+
+% Define exponential decay function
+for ii = 1:length_t
+    if t(ii) < 0  
+        x_t(ii) = 0;  % Set to 0 for t < 0
+    else 
+        x_t(ii) = 3 * exp(-2 * t(ii));  % Exponential decay for t >= 0
+    end
+end
+% Plot the exponential decay function
+subplot(4,1,1), plot(t, x_t);
+xlabel('time (t)');
+ylabel('x(t)');
+title('Exponential Decay Function in Time Domain');
+
+% Compute Fourier Transform X(ω)
+for ii = 1:length_omega
+    temp = x_t .* expo_omega(ii, :);  % x(t) * exp(-jωt)
+    x_omega(ii) = my_int_func(temp, step_size_t);  % Fourier Transform
+end
+
+% Plot the magnitude of the Fourier transform
+subplot(4,1,2), plot(omegax ./ pi, abs(x_omega));
+xlabel('\omega/\pi');
+ylabel('|X(\omega)|');
+title('Fourier Transform of the Exponential Decay Function');
+
+% Inverse Fourier Transform (reconstruct x(t))
+expo_omega_2 = exp(1j * omegax' * t);  % Create matrix of exp(jωt) for inverse transform
+
+for ii = 1:length_t
+    temp_2 = x_omega .* expo_omega_2(:, ii).';  % X(ω) * exp(jωt)
+    x_t_reconstructed(ii) = (1 / (2 * pi)) * my_int_func(temp_2, step_omega);  % Inverse Fourier Transform
+end
+
+% Plot the reconstructed signal
+subplot(4,1,3), plot(t, real(x_t_reconstructed));
+xlabel('time (t)');
+ylabel('Reconstructed x(t)');
+title('Reconstructed Signal from Fourier Transform');
+
+% Calculate and plot the phase of X(omega)
+Angle_X_Omega = atan2(imag(x_omega), real(x_omega));  % Compute phase using atan2 for correct quadrant
+
+% Plot the phase of the Fourier transform
+subplot(4,1,4), plot(omegax ./ pi, Angle_X_Omega);
+xlabel('\omega/\pi');
+ylabel('Phase \angle X(\omega) (radians)');
+title('Phase of Fourier Transform X(\omega)');
+
+% Custom integration function (trapezoidal rule)
+function [int_ans] = my_int_func(Data, step_size)
+    int_ans = (step_size / 2) * (Data(1) + Data(end) + 2 * sum(Data(2:end-1)));
+end
+ 
+
+
+ 
+
+
+
+          FOURIER TRANSFORMS – Double-Sided Exponential Decay Function
+ 
+ 
+clear all;
+close all;
+clc
+% Constants
+step_omega = 0.01 * pi;
+step_size_t = 0.1;
+t = -10:step_size_t:10;
+length_t = length(t);
+
+% Omega range for frequency domain
+omegax = -(1 / step_size_t) * pi : step_omega : (1 / step_size_t) * pi;
+length_omega = length(omegax);
+% Pre-allocate arrays
+expo_omega = zeros(length_omega, length_t);
+x_omega = zeros(1, length_omega);
+x_t_reconstructed = zeros(1, length_t);
+
+% Create Fourier exponentials
+for ii = 1:length_omega
+    expo_omega(ii, :) = exp(-1j * omegax(ii) * t);
+end
+
+% Define double-sided exponential function
+x_t = zeros(1, length_t);  % Initialize x_t with zeros
+% Define exponential growth for t < 0 and decay for t >= 0
+for ii = 1:length_t
+    if t(ii) < 0 
+        x_t(ii) = 3 * exp(2 * t(ii));  % Exponential growth for t < 0
+    else 
+        x_t(ii) = 3 * exp(-2 * t(ii)); % Exponential decay for t >= 0
+    end
+end
+
+% Plot the double-sided exponential function
+subplot(4,1,1), plot(t, x_t);
+xlabel('time (t)');
+ylabel('x(t)');
+title('Double-Sided Exponential Function in Time Domain');
+% Compute Fourier Transform X(ω)
+for ii = 1:length_omega
+    temp = x_t .* expo_omega(ii, :);  % x(t) * exp(-jωt)
+    x_omega(ii) = my_int_func(temp, step_size_t);  % Fourier Transform
+end
+
+% Plot the magnitude of the Fourier transform
+subplot(4,1,2), plot(omegax ./ pi, abs(x_omega));
+xlabel('\omega/\pi');
+ylabel('|X(\omega)|');
+title('Fourier Transform of the Double-Sided Exponential Function');
+% Inverse Fourier Transform (reconstruct x(t))
+expo_omega_2 = exp(1j * omegax' * t);  % Create matrix of exp(jωt) for inverse transform
+
+for ii = 1:length_t
+    temp_2 = x_omega .* expo_omega_2(:, ii).';  % X(ω) * exp(jωt)
+    x_t_reconstructed(ii) = (1 / (2 * pi)) * my_int_func(temp_2, step_omega);  % Inverse Fourier Transform
+end
+
+% Plot the reconstructed signal
+subplot(4,1,3), plot(t, real(x_t_reconstructed));
+xlabel('time (t)');
+ylabel('Reconstructed x(t)');
+title('Reconstructed Signal from Fourier Transform');
+% Calculate and plot the phase of X(omega)
+Angle_X_Omega = atan2(imag(x_omega), real(x_omega));  % Compute phase using atan2 for correct quadrant
+% Plot the phase of the Fourier transform
+subplot(4,1,4), plot(omegax ./ pi, Angle_X_Omega);
+xlabel('\omega/\pi');
+ylabel('Phase \angle X(\omega) (radians)');
+title('Phase of Fourier Transform X(\omega)');
+
+% Custom integration function (trapezoidal rule)
+function [int_ans] = my_int_func(Data, step_size)
+    int_ans = (step_size / 2) * (Data(1) + Data(end) + 2 * sum(Data(2:end-1)));
+end
+ 
+
+
+ 
+
+FOURIER TRANSFORMS – Sine Function
+
+ 
+clear all;
+close all;
+clc
+
+% Constants
+step_omega = 0.01 * pi;
+step_size_t = 0.1;
+t = -10:step_size_t:10;
+length_t = length(t);
+
+% Omega range for frequency domain
+omegax = -(1 / step_size_t) * pi : step_omega : (1 / step_size_t) * pi;
+length_omega = length(omegax);
+
+% Pre-allocate arrays
+expo_omega = zeros(length_omega, length_t);
+x_omega = zeros(1, length_omega);
+x_t_reconstructed = zeros(1, length_t);
+
+% Create Fourier exponentials
+for ii = 1:length_omega
+    expo_omega(ii, :) = exp(-1j * omegax(ii) * t);
+end
+
+% Define sine function within a specified range
+x_t = zeros(1, length_t);  % Initialize x_t with zeros
+
+for ii = 1:length_t
+        x_t(ii) = sin(t(ii)); 
+end
+
+% Plot the sine function in the time domain
+subplot(4,1,1), plot(t, x_t);
+xlabel('time (t)');
+ylabel('x(t)');
+title('Sine Function in Time Domain');
+
+% Compute Fourier Transform X(ω)
+for ii = 1:length_omega
+    temp = x_t .* expo_omega(ii, :);  % x(t) * exp(-jωt)
+    x_omega(ii) = my_int_func(temp, step_size_t);  % Fourier Transform
+end
+
+% Plot the magnitude of the Fourier transform
+subplot(4,1,2), plot(omegax ./ pi, abs(x_omega));
+xlabel('\omega/\pi');
+ylabel('|X(\omega)|');
+title('Fourier Transform of the Sine Function');
+
+% Inverse Fourier Transform (reconstruct x(t))
+expo_omega_2 = exp(1j * omegax' * t);  % Create matrix of exp(jωt) for inverse transform
+
+for ii = 1:length_t
+    temp_2 = x_omega .* expo_omega_2(:, ii).';  % X(ω) * exp(jωt)
+    x_t_reconstructed(ii) = (1 / (2 * pi)) * my_int_func(temp_2, step_omega);  % Inverse Fourier Transform
+end
+
+% Plot the reconstructed signal
+subplot(4,1,3), plot(t, real(x_t_reconstructed));
+xlabel('time (t)');
+ylabel('Reconstructed x(t)');
+title('Reconstructed Signal from Fourier Transform');
+
+% Calculate and plot the phase of X(omega)
+Angle_X_Omega = atan2(imag(x_omega), real(x_omega));  % Compute phase using atan2 for correct quadrant
+
+% Plot the phase of the Fourier transform
+subplot(4,1,4), plot(omegax ./ pi, Angle_X_Omega);
+xlabel('\omega/\pi');
+ylabel('Phase \angle X(\omega) (radians)');
+title('Phase of Fourier Transform X(\omega)');
+
+% Custom integration function (trapezoidal rule)
+function [int_ans] = my_int_func(Data, step_size)
+    int_ans = (step_size / 2) * (Data(1) + Data(end) + 2 * sum(Data(2:end-1)));
+end
+ 
+
+
+ 
+
+
+
+FOURIER TRANSFORMS – Cosine Function
+
+ 
+ clear all;
+close all;
+clc
+
+% Constants
+step_omega = 0.01 * pi;
+step_size_t = 0.1;
+t = -10:step_size_t:10;  % Time vector
+length_t = length(t);     % Length of time vector
+
+% Omega range for frequency domain
+omegax = -(1 / step_size_t) * pi : step_omega : (1 / step_size_t) * pi;
+length_omega = length(omegax);
+
+% Pre-allocate arrays
+expo_omega = zeros(length_omega, length_t);
+x_omega = zeros(1, length_omega);
+x_t_reconstructed = zeros(1, length_t);
+
+% Create Fourier exponentials
+for ii = 1:length_omega
+    expo_omega(ii, :) = exp(-1j * omegax(ii) * t);  % Exponential matrix for Fourier Transform
+end
+
+% Define cosine function
+x_t = zeros(1, length_t);  % Initialize x_t with zeros
+
+for ii = 1:length_t
+    x_t(ii) = cos(t(ii));  % Cosine function
+end
+
+% Plot the cosine function in the time domain
+subplot(4,1,1), plot(t, x_t);
+xlabel('time (t)');
+ylabel('x(t)');
+title('Cosine Function in Time Domain');  % Updated title for cosine function
+
+% Compute Fourier Transform X(ω)
+for ii = 1:length_omega
+    temp = x_t .* expo_omega(ii, :);  % x(t) * exp(-jωt)
+    x_omega(ii) = my_int_func(temp, step_size_t);  % Fourier Transform
+end
+
+% Plot the magnitude of the Fourier transform
+subplot(4,1,2), plot(omegax ./ pi, abs(x_omega));
+xlabel('\omega/\pi');
+ylabel('|X(\omega)|');
+title('Fourier Transform of the Cosine Function');  % Updated title for cosine function
+
+% Inverse Fourier Transform (reconstruct x(t))
+expo_omega_2 = exp(1j * omegax' * t);  % Create matrix of exp(jωt) for inverse transform
+for ii = 1:length_t
+    temp_2 = x_omega .* expo_omega_2(:, ii).';  % X(ω) * exp(jωt)
+    x_t_reconstructed(ii) = (1 / (2 * pi)) * my_int_func(temp_2, step_omega);  % Inverse Fourier Transform
+end
+% Plot the reconstructed signal
+subplot(4,1,3), plot(t, real(x_t_reconstructed));
+xlabel('time (t)');
+ylabel('Reconstructed x(t)');
+title('Reconstructed Signal from Fourier Transform');  % Title for reconstructed signal
+
+% Calculate and plot the phase of X(ω)
+Angle_X_Omega = atan2(imag(x_omega), real(x_omega));  % Compute phase using atan2 for correct quadrant
+
+% Plot the phase of the Fourier transform
+subplot(4,1,4), plot(omegax ./ pi, Angle_X_Omega);
+xlabel('\omega/\pi');
+ylabel('Phase \angle X(\omega) (radians)');
+title('Phase of Fourier Transform X(\omega)');  % Title for phase plot
+
+% Custom integration function (trapezoidal rule)
+function [int_ans] = my_int_func(Data, step_size)
+    int_ans = (step_size / 2) * (Data(1) + Data(end) + 2 * sum(Data(2:end-1)));  % Trapezoidal rule
+end
+ 
+
+ 
+
+
+
+     FOURIER TRANSFORMS – Unit Step Function
+
+ 
+clear all;
+close all;
+clc;
+% Constants
+step_omega = 0.01 * pi;
+step_size_t = 0.1;
+t = -10:step_size_t:10;  % Time vector
+length_t = length(t);     % Length of time vector
+
+% Omega range for frequency domain
+omegax = -(1 / step_size_t) * pi : step_omega : (1 / step_size_t) * pi;
+length_omega = length(omegax);
+% Pre-allocate arrays
+expo_omega = zeros(length_omega, length_t);
+x_omega = zeros(1, length_omega);
+x_t_reconstructed = zeros(1, length_t);
+x_t = zeros(1, length_t);  % Initialize x(t)
+
+% Create Fourier exponentials
+for ii = 1:length_omega
+    expo_omega(ii, :) = exp(-1j * omegax(ii) * t);  % Exponential matrix for Fourier Transform
+end
+
+% Define Unit Step Function
+for ii = 1:length_t  % Use length_t instead of undefined tt
+    if t(ii) < 0
+        x_t(ii) = 0;  % Values before 0
+    else
+        x_t(ii) = 1;  % Values from 0 onward
+    end
+end
+
+% Plot the unit step function in the time domain
+subplot(4,1,1), plot(t, x_t);
+xlabel('time (t)');
+ylabel('x(t)');
+title('Unit Step Function in Time Domain');  % Updated title for unit step function
+
+% Compute Fourier Transform X(ω)
+for ii = 1:length_omega
+    temp = x_t .* expo_omega(ii, :);  % x(t) * exp(-jωt)
+    x_omega(ii) = my_int_func(temp, step_size_t);  % Fourier Transform
+end
+
+% Plot the magnitude of the Fourier transform
+subplot(4,1,2), plot(omegax ./ pi, abs(x_omega));
+xlabel('\omega/\pi');
+ylabel('|X(\omega)|');
+title('Magnitude of Fourier Transform of Unit Step Function');  % Updated title
+
+% Inverse Fourier Transform (reconstruct x(t))
+expo_omega_2 = exp(1j * omegax' * t);  % Create matrix of exp(jωt) for inverse transform
+
+for ii = 1:length_t
+    temp_2 = x_omega .* expo_omega_2(:, ii).';  % X(ω) * exp(jωt)
+    x_t_reconstructed(ii) = (1 / (2 * pi)) * my_int_func(temp_2, step_omega);  % Inverse Fourier Transform
+end
+
+% Plot the reconstructed signal
+subplot(4,1,3), plot(t, real(x_t_reconstructed));
+xlabel('time (t)');
+ylabel('Reconstructed x(t)');
+title('Reconstructed Signal from Fourier Transform');  % Title for reconstructed signal
+% Calculate and plot the phase of X(ω)
+Angle_X_Omega = atan2(imag(x_omega), real(x_omega));  % Compute phase using atan2 for correct quadrant
+
+% Plot the phase of the Fourier transform
+subplot(4,1,4), plot(omegax ./ pi, Angle_X_Omega);
+xlabel('\omega/\pi');
+ylabel('Phase \angle X(\omega) (radians)');
+title('Phase of Fourier Transform X(\omega)');  % Title for phase plot
+% Custom integration function (trapezoidal rule)
+function [int_ans] = my_int_func(Data, step_size)
+    int_ans = (step_size / 2) * (Data(1) + Data(end) + 2 * sum(Data(2:end-1)));  % Trapezoidal rule
+end
+ 
+
+
+ 
+
+FOURIER TRANSFORMS – Signum Function
+
+ 
+clear all;
+close all;
+clc;
+
+% Constants
+step_omega = 0.01 * pi;
+step_size_t = 0.1;
+t = -10:step_size_t:10;  % Time vector
+length_t = length(t);     % Length of time vector
+
+% Omega range for frequency domain
+omegax = -(1 / step_size_t) * pi : step_omega : (1 / step_size_t) * pi;
+length_omega = length(omegax);
+
+% Pre-allocate arrays
+x_omega = zeros(1, length_omega);
+x_t_reconstructed = zeros(1, length_t);
+v_t = zeros(1, length_t);  % Initialize signum function
+
+% Initialize v_t for signum function signal
+for ii = 1:length_t  % Use length_t instead of undefined tt
+    if t(ii) < 0
+        v_t(ii) = -1;  % Negative values
+    elseif t(ii) == 0
+        v_t(ii) = 0;   % Zero
+    else
+        v_t(ii) = 1;   % Positive values
+    end
+end
+
+% Plot the signum function in the time domain
+subplot(4,1,1), plot(t, v_t);
+xlabel('time (t)');
+ylabel('v(t)');
+title('Signum Function in Time Domain');  % Updated title for signum function
+
+% Compute Fourier Transform X(ω)
+for ii = 1:length_omega
+    temp = v_t .* exp(-1j * omegax(ii) * t);  % v(t) * exp(-jωt)
+    x_omega(ii) = my_int_func(temp, step_size_t);  % Fourier Transform
+end
+
+% Plot the magnitude of the Fourier transform
+subplot(4,1,2), plot(omegax ./ pi, abs(x_omega));
+xlabel('\omega/\pi');
+ylabel('|X(\omega)|');
+title('Magnitude of Fourier Transform of Signum Function');  % Updated title
+
+% Inverse Fourier Transform (reconstruct v(t))
+expo_omega_2 = exp(1j * omegax' * t);  % Create matrix of exp(jωt) for inverse transform
+
+for ii = 1:length_t
+    temp_2 = x_omega .* expo_omega_2(:, ii).';  % X(ω) * exp(jωt)
+    x_t_reconstructed(ii) = (1 / (2 * pi)) * my_int_func(temp_2, step_omega);  % Inverse Fourier Transform
+end
+
+% Plot the reconstructed signal
+subplot(4,1,3), plot(t, real(x_t_reconstructed));
+xlabel('time (t)');
+ylabel('Reconstructed v(t)');
+title('Reconstructed Signal from Fourier Transform');  % Title for reconstructed signal
+
+% Calculate and plot the phase of X(ω)
+Angle_X_Omega = atan2(imag(x_omega), real(x_omega));  % Compute phase using atan2 for correct quadrant
+
+% Plot the phase of the Fourier transform
+subplot(4,1,4), plot(omegax ./ pi, Angle_X_Omega);
+xlabel('\omega/\pi');
+ylabel('Phase \angle X(\omega) (radians)');
+title('Phase of Fourier Transform X(\omega)');  % Title for phase plot
+
+% Custom integration function (trapezoidal rule)
+function [int_ans] = my_int_func(Data, step_size)
+    int_ans = (step_size / 2) * (Data(1) + Data(end) + 2 * sum(Data(2:end-1)));  % Trapezoidal rule
+end
+ 
+
+
+ 
+
+
+FOURIER TRANSFORMS – Gate Function / Square Wave 
+
+ 
+clear all;
+close all;
+clc;
+
+% Constants
+step_omega = 0.01 * pi;
+step_size_t = 0.1;
+t = -5:step_size_t:5; % Time vector
+length_t = length(t);
+
+% Omega range for frequency domain
+omegax = -(1 / step_size_t) * pi : step_omega : (1 / step_size_t) * pi;
+length_omega = length(omegax);
+
+% Pre-allocate arrays
+expo_omega = zeros(length_omega, length_t);
+x_omega = zeros(1, length_omega);
+x_t_reconstructed = zeros(1, length_t);
+% Create Fourier exponentials
+for ii = 1:length_omega
+    expo_omega(ii, :) = exp(-1j * omegax(ii) * t);
+end
+% Define parameters for the square wave (gate function)
+period = 5;              % Duration of one full period
+half_period = period / 2; % Half of the period
+
+
+% Pre-allocate array for the square wave function
+x_t = zeros(1, length_t);
+% Create the square wave signal
+for ii = 1:length_t
+    mod_time = mod(t(ii), period);  % Determine position within the current period
+if (mod_time <= half_period)  % High part of the square wave
+        x_t(ii) = 1;               % Set value to 1
+    else                          % Low part of the square wave
+        x_t(ii) = -1;              % Set value to -1
+    end
+end
+
+% Plot the square wave function
+subplot(4, 1, 1), plot(t, x_t);
+xlabel('time (t)');
+ylabel('x(t)');
+title('Square Wave Function in Time Domain');
+
+% Compute Fourier Transform X(ω)
+for ii = 1:length_omega
+    temp = x_t .* expo_omega(ii, :);  % x(t) * exp(-jωt)
+    x_omega(ii) = my_int_func(temp, step_size_t);  % Fourier Transform
+end
+
+% Plot the magnitude of the Fourier transform
+subplot(4, 1, 2), plot(omegax ./ pi, abs(x_omega));
+xlabel('\omega/\pi');
+ylabel('|X(\omega)|');
+title('Fourier Transform of the Square Wave Function');
+
+% Inverse Fourier Transform (reconstruct x(t))
+expo_omega_2 = exp(1j * omegax' * t);  % Create matrix of exp(jωt) for inverse transform
+for ii = 1:length_t
+    temp_2 = x_omega .* expo_omega_2(:, ii).';  % X(ω) * exp(jωt)
+    x_t_reconstructed(ii) = (1 / (2 * pi)) * my_int_func(temp_2, step_omega);  % Inverse Fourier Transform
+end
+% Plot the reconstructed signal
+subplot(4, 1, 3), plot(t, real(x_t_reconstructed));
+xlabel('time (t)');
+ylabel('Reconstructed x(t)');
+title('Reconstructed Signal from Fourier Transform');
+
+% Calculate and plot the phase of X(ω)
+Angle_X_Omega = atan2(imag(x_omega), real(x_omega));  % Compute phase using atan2 for correct quadrant
+% Plot the phase of the Fourier transform
+subplot(4, 1, 4), plot(omegax ./ pi, Angle_X_Omega);
+xlabel('\omega/\pi');
+ylabel('Phase \angle X(\omega) (radians)');
+title('Phase of Fourier Transform X(\omega)');
+
+% Custom integration function (trapezoidal rule)
+function [int_ans] = my_int_func(Data, step_size)
+    int_ans = (step_size / 2) * (Data(1) + Data(end) + 2 * sum(Data(2:end-1)));
+end 
+
+ 
