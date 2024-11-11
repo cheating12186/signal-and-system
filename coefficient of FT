@@ -1,0 +1,55 @@
+%fourier transform
+clear all;
+close all;
+clc;
+% Parameters
+time_period = 1;
+step_size_t = 0.0001;
+t = -time_period/2:step_size_t:time_period/2;
+tt = length(t);
+omega_o = 2 * pi / time_period;
+no_of_fourier_coeff = 50;
+n = -no_of_fourier_coeff:1:no_of_fourier_coeff;
+% Define the square wave signal
+for ii = 1:tt
+if (t(ii) < -0.25)
+x(ii) = -1;
+elseif (t(ii) > -0.25 && t(ii) < 0.25)
+x(ii) = 1;
+else
+x(ii) = -1;
+end
+end
+% Plot the square wave signal
+figure;
+plot(t, x)
+xlabel("time (t)")
+ylabel("x(t)")
+title("Square Wave Signal")
+EXPERIMENT -6
+% Fourier series coefficients calculation using
+my_int_fun
+for ii = 1:1:(2*no_of_fourier_coeff+1)
+temp1 = x .* exp(-1j * omega_o * n(ii) * t);
+int_ans = my_int_fun(temp1, step_size_t); %
+Using your custom integration function
+c(ii) = (1 / time_period) * int_ans;
+end
+% Plot the magnitude of Fourier coefficients
+figure;
+stem(n, abs(c));
+xlabel('n');
+ylabel('|C_n|');
+title('Magnitude of Fourier Coefficients');
+% Plot the phase of Fourier coefficients
+figure;
+stem(n, angle(c));
+xlabel('n');
+ylabel('Phase of C_n (radians)');
+title('Phase of Fourier Coefficients');
+% Custom integration function
+function [int_ans] = my_int_fun(data, step_size)
+int_ans = (step_size / 2) * (data(1,1) +
+data(1,end) + 2 * sum(data(2:end-1))); %
+Corrected sum range
+end
