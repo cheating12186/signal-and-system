@@ -1,0 +1,109 @@
+clc
+clear all
+close all
+step_omega=0.01*pi;
+step_size_t=0.1;
+t=-40:step_size_t:40;
+length_t=length(t);
+omegax=-
+(1/step_size_t)*pi:step_omega:(1/step_size_t)*pi;
+length_omega=length(omegax);
+sigmax=-5:0.01:5;
+[X,Y] = meshgrid(sigmax,omegax);
+for ii=1:length_omega
+expo_omega(ii,:)=exp(-1j*omegax(ii).*t);
+end
+for ii=1:length(sigmax)
+expo_sigma(ii,:)=exp(-1*sigmax(ii).*t);
+end
+%%%Impulse
+% for ii=1:length_t
+% if(t(ii)==0)
+% x_t(ii)=1/step_size_t;
+% else
+% x_t(ii)=0;
+% end
+% end
+%%%%%%%%%%%% Unit Step
+for ii=1:length_t
+if(t(ii)<0)
+x_t(ii)=0;
+else
+x_t(ii)=1;
+end
+
+end
+% %%%%%%%%%% Signum
+% for ii=1:length_t
+% if(t(ii)<0)
+% x_t(ii)=-1;
+% else
+% x_t(ii)=1;
+% end
+% end
+% %%%%%%%%%%%%% Decaying Exponential
+for ii=1:length_t
+if(t(ii)<0)
+x_t(ii)=0;
+else
+x_t(ii)=3*exp(-2*t(ii));
+end
+end
+% %%%%%%%%%%%%%Double Side Exponential
+% for ii=1:length_t
+% if(t(ii)<0)
+% x_t(ii)=3*exp(2*t(ii));
+% else
+% x_t(ii)=3*exp(-2*t(ii));
+% end
+% end
+%%%%%%%%%%%%%% Sin
+%x_t=1*sin(2*pi*(1/(2*step_size_t))*0.5.*t);
+% %%%%%%%%%% Cos
+% x_t=1*cos(2*pi*(1/(2*step_size_t))*0.5.*t);
+%%%%%%%%%% Sinc
+% for ii=1:length_t
+% if(t(ii)==0)
+% x_t(ii)=1;
+% else
+%
+x_t(ii)=1*sin((2*pi*(1/(2*step_size_t)))*0.5*t(ii))
+...
+
+%
+/((2*pi*(1/(2*step_size_t)))*0.5*t(ii));
+% end
+% end
+%
+%%%%%%%%%%% Gate
+% for ii=1:length_t
+% if(t(ii)<-1/2)
+% x_t(ii)=0;
+% elseif(t(ii)>=-1/2 && t(ii)<=1/2)
+% x_t(ii)=1;
+% else
+% x_t(ii)=0;
+% end
+% end
+%%%%%%%%Sinc
+% for ii=1:length_t
+% x_t(ii)=sinc(t(ii));
+% end
+% %
+
+subplot(2,1,1), plot(t, x_t)
+for ii=1:length(sigmax)
+temp=x_t.*expo_sigma(ii,:);
+for jj=1:length(omegax)
+temp1=temp.*expo_omega(jj,:);
+X_s(jj,ii)=my_int_fun(temp1,step_size_t);
+temp1=[];
+end
+temp=[];
+end
+subplot(2,1,2), surf(X, Y, 10*log10(abs(X_s)),
+'edgecolor', 'none');
+xlabel('Sigma'), ylabel('j\omega'),
+zlabel('10*log_{10}{\it X}({\it s})');
+
+colorbar
