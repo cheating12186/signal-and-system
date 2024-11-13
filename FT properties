@@ -1,0 +1,188 @@
+%Aim : Properties of Fourier Tranform .
+% Shifting and Scaling Properties and Parseval's Theorem
+
+clear all;
+close all;
+clc;
+
+% Define parameters
+step_omega = 0.01 * pi;
+step_size_t = 0.1;
+t = -40: step_size_t:40;
+x_omega = -(1 / step_size_t) * pi : step_omega : (1 / step_size_t) * pi;
+
+% Pre-allocate Fourier transform matrix
+exp_omega = zeros(length(x_omega), length(t));
+for ii = 1:length(x_omega)
+    exp_omega(ii, :) = exp(-1j * x_omega(ii) * t);
+end
+
+% Define Gate Function (Rectangular Pulse)
+width = 1;
+x_t = (t >= -width / 2) & (t <= width / 2);
+
+% Property 1: Shifting Property
+shift = 10; % Example shift amount
+x_t_shifted = (t - shift >= -width / 2) & (t - shift <= width / 2);
+
+figure;
+subplot(3, 1, 1);
+plot(t, x_t_shifted);
+title(["Shifted Signal x(t - ', num2str(shift), ')"]);
+
+x_omega_shifted = zeros(1, length(x_omega)); 
+% Initialize array
+for ii = 1:length(x_omega)
+    temp_shift = x_t_shifted .* exp_omega(ii, :);
+    x_omega_shifted(1, ii) = trapz(t, temp_shift);
+    % Replaced `my_int_fun` with `trapz`
+end
+
+subplot(3, 1, 2);
+plot(x_omega, abs(x_omega_shifted));
+title('Magnitude Spectrum |X(\omega)| after Shifting');
+
+subplot(3, 1, 3);
+plot(x_omega, angle(x_omega_shifted));
+title('Phase Spectrum \angle X(\omega) after Shifting');
+
+% Property 2: Scaling Property
+scale_factor = 2; % Example scale factor
+x_t_scaled = ((t / scale_factor) >= -width / 2) & ((t / scale_factor) <= width / 2);
+
+figure;
+subplot(3, 1, 1);
+plot(t, x_t_scaled);
+title(['Scaled Signal x(at) with a = ', num2str(scale_factor)]);
+
+x_omega_scaled = zeros(1, length(x_omega));
+% Initialize array
+for ii = 1:length(x_omega)
+    temp_scale = x_t_scaled .* exp_omega(ii, :);
+    x_omega_scaled(1, ii) = trapz(t, temp_scale); 
+    % Replaced `my_int_fun` with `trapz`
+end
+
+subplot(3, 1, 2);
+plot(x_omega, abs(x_omega_scaled));
+title('Magnitude Spectrum |X(\omega)| after Scaling');
+
+subplot(3, 1, 3);
+plot(x_omega, angle(x_omega_scaled));
+title('Phase Spectrum \angle X(\omega) after Scaling');
+
+% Property 3: Parseval's Theorem
+energy_time_domain = sum(abs(x_t).^2) * step_size_t;
+energy_freq_domain = sum(abs(x_omega).^2) * step_omega / (2 * pi);
+
+fprintf('Energy in time domain: %.4f\n', energy_time_domain);
+fprintf('Energy in frequency domain: %.4f\n', energy_freq_domain);
+
+% Check if Parseval's theorem holds
+if abs(energy_time_domain - energy_freq_domain) < 1e-3
+    disp('Parseval''s theorem is verified: Energy in tim  and frequency domains are equal.');
+else
+    disp('Parseval''s theorem is not verified.');
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+----------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+clc;
+clear all;
+close all;
+
+step_omega = 0.01 * pi;
+step_size_t = 0.1;
+t = -40:step_size_t:40;
+length_t = length(t);
+
+omegax = -(1/step_size_t) * pi : step_omega : (1/step_size_t) * pi;
+length_omega = length(omegax);
+
+sigmax = -5:0.01:5;
+[X, Y] = meshgrid(sigmax, omegax);
+
+% Compute expo_omega
+for ii = 1:length_omega
+    expo_omega(ii, :) = exp(-1j * omegax(ii) * t);
+end
+
+% Compute expo_sigma
+for ii = 1:length(sigmax)
+    expo_sigma(ii, :) = exp(-1 * sigmax(ii) * t);
+end
+
+% Unit Step
+x_t = zeros(1, length_t);
+for ii = 1:length_t
+    if t(ii) >= 0
+        x_t(ii) = 1;
+    end
+end
+
+% Decaying Exponential
+for ii = 1:length_t
+    if t(ii) >= 0
+        x_t(ii) = 3 * exp(-2 * t(ii));
+    end
+end
+
+% Sinc function
+for ii = 1:length_t
+    if t(ii) == 0
+        x_t(ii) = 1;
+    else
+        x_t(ii) = sin((2 * pi * (1 / (2 * step_size_t))) * 0.5 * t(ii)) / ...
+                  ((2 * pi * (1 / (2 * step_size_t))) * 0.5 * t(ii));
+    end
+end
+
+% Plot x_t
+subplot(2, 1, 1);
+plot(t, x_t);
+title('x(t)');
+xlabel('Time (t)');
+ylabel('x(t)');
+
+% Transform calculations
+for ii = 1:length(sigmax)
+    temp = x_t .* expo_sigma(ii, :);
+    for jj = 1:length(omegax)
+        temp1 = temp .* expo_omega(jj, :);
+        
+        % Integrate using trapz for approximation
+        X_s(jj, ii) = trapz(t, temp1);
+        
+        temp1 = [];
+    end
+    temp = [];
+end
+
+% Plot X(s)
+subplot(2, 1, 2);
+surf(X, Y, 10 * log10(abs(X_s)), 'EdgeColor', 'none');
+xlabel('Sigma');
+ylabel('j\omega');
+zlabel('10*log_{10}{\it X}({\it s})');
+title('Magnitude of X(s)');
